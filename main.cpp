@@ -6,7 +6,7 @@ using namespace std;
 using namespace Eigen;
 
 double errore_PALU (const MatrixXd& A, const VectorXd& b, const VectorXd& x_vero ){
-    VectorXd x = A.partialPivLu().solve(b); //fullPivLu è piu lento ma funziona meglio 
+    VectorXd x = A.partialPivLu().solve(b); //fullPivLu è piu lento ma funziona meglio (stabilità numerica)
     double errore = ((x-x_vero).norm())/(x_vero.norm());
     return errore;
 }
@@ -17,6 +17,7 @@ double errore_QR (const MatrixXd& A, const VectorXd& b, const VectorXd& x_vero )
     return errore;
 }
 
+
 //FUNZIONE PER VEDERE QUELLA CON L'ERRORE MINORE ( facoltativo)
 void confronto (const MatrixXd& A, const VectorXd& b, const VectorXd& x_vero) {
     if (errore_PALU(A,b,x_vero)>errore_QR(A,b,x_vero)){
@@ -25,6 +26,15 @@ void confronto (const MatrixXd& A, const VectorXd& b, const VectorXd& x_vero) {
         cout<<"il valore PALU è migliore"<<endl;
     }
 }
+
+void stampa (const MatrixXd& A, const VectorXd& b, const VectorXd& x_vero, const string& nome) {
+    cout << "Errore PALU per " << nome << ": " << setprecision(30) << scientific << errore_PALU(A, b, x_vero) << endl;
+    cout << "Errore QR   per " << nome << ": " << setprecision(30) << scientific << errore_QR(A, b, x_vero) << endl;
+    cout << "Confronto per " << nome << ": ";
+    confronto(A, b, x_vero);
+    cout << endl;
+}
+
 
 int main()
 { 
@@ -45,21 +55,10 @@ int main()
     VectorXd x_vero(2);
     x_vero << -1.0e+0,-1.0e+00;
 
-    cout << "Errore PALU per A: " << setprecision(30) << scientific<< errore_PALU(A,b,x_vero) <<  endl;
-    cout << "Errore PALU per A1: " << setprecision(30) << scientific<< errore_PALU(A1,b1,x_vero) <<  endl;
-    cout << "Errore PALU per A2: " << setprecision(30) << scientific<< errore_PALU(A2,b2,x_vero) <<  endl;
+    stampa(A, b, x_vero, "A"); // essendo void non posso usarlo con cout
+    stampa(A1, b1, x_vero, "A1");
+    stampa(A2, b2, x_vero, "A2");
 
-    cout << "Errore QR per A: " << setprecision(30) << scientific<< errore_QR(A,b,x_vero) <<  endl;
-    cout << "Errore QR per A1: " << setprecision(30) << scientific<< errore_QR(A1,b1,x_vero) <<  endl;
-    cout << "Errore QR per A2: " << setprecision(30) << scientific<< errore_QR(A2,b2,x_vero) <<  endl;
-
-    //PER VERIFICARE LA MIGLIORE (facoltativo)
-    cout << "per A: "; 
-    confronto(A,b,x_vero) ; // essendo void non posso usarlo con cout
-    cout << "per A1: ";
-    confronto(A1,b1,x_vero);
-    cout << "per A2: " ;
-    confronto(A2,b2,x_vero);
     
     return 0;
 
